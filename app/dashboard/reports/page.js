@@ -1,6 +1,7 @@
 "use client";
 
 import { useFinance } from "../../../context/finance-context";
+import ExportActions from "../../../components/cards/export-actions"
 
 export default function ReportsPage() {
   const { transactions } = useFinance();
@@ -16,6 +17,8 @@ mb-6
       >
         Reportes
       </h1>
+
+      <ExportActions />
 
       <div
         className="

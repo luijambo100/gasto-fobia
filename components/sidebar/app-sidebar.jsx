@@ -1,56 +1,97 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from "next/link";
+
+import { usePathname } from "next/navigation";
+
+import { useUI } from "../../context/ui-context";
+
 import {
   LayoutDashboard,
-  Wallet,
   Receipt,
+  Wallet,
   PieChart,
-  Settings
-} from "lucide-react"
+  Settings,
+  Menu,
+} from "lucide-react";
 
 const items = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Transacciones", href: "/dashboard/transactions", icon: Receipt },
-  { name: "Presupuestos", href: "/dashboard/budgets", icon: Wallet },
-  { name: "Reportes", href: "/dashboard/reports", icon: PieChart },
-  { name: "Configuración", href: "/dashboard/settings", icon: Settings }
-]
+  ["Dashboard", "/dashboard", LayoutDashboard],
+
+  ["Transacciones", "/dashboard/transactions", Receipt],
+
+  ["Presupuestos", "/dashboard/budgets", Wallet],
+
+  ["Reportes", "/dashboard/reports", PieChart],
+
+  ["Configuración", "/dashboard/settings", Settings],
+];
 
 export default function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
+
+  const { sidebarOpen, toggleSidebar } = useUI();
 
   return (
-    <aside className="w-72 bg-slate-950 border-r border-slate-800 p-4">
-      
-      <div className="text-2xl font-bold p-4 mb-6">
-        💸 GastoFobia
+    <aside
+      className={`
+
+transition-all
+
+duration-300
+
+border-r
+
+border-slate-800
+
+bg-slate-950
+
+${sidebarOpen ? "w-72" : "w-20"}
+
+`}
+    >
+      <div
+        className="
+p-4
+"
+      >
+        <button onClick={toggleSidebar}>
+          <Menu />
+        </button>
       </div>
 
-      <nav className="space-y-1">
-        {items.map((item) => {
-          const Icon = item.icon
-          const active = pathname === item.href
+      <nav
+        className="
+space-y-2
+px-3
+"
+      >
+        {items.map(([label, href, Icon]) => (
+          <Link
+            key={href}
+            href={href}
+            className={`
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`
-                flex items-center gap-3 px-4 py-3 rounded-xl transition
-                ${active 
-                  ? "bg-blue-600 text-white" 
-                  : "text-gray-400 hover:bg-slate-800 hover:text-white"}
-              `}
-            >
-              <Icon size={18} />
-              {item.name}
-            </Link>
-          )
-        })}
+flex
+
+items-center
+
+gap-3
+
+rounded-xl
+
+p-3
+
+${pathname === href ? "bg-blue-600" : "hover:bg-slate-800"}
+
+`}
+          >
+            <Icon />
+
+            {sidebarOpen && label}
+          </Link>
+        ))}
       </nav>
-
     </aside>
-  )
+  );
 }

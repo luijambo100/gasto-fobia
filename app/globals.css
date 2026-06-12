@@ -1,28 +1,66 @@
 @import "tailwindcss";
 
-:root{
---background:#0F172A;
---card:#1E293B;
---primary:#2563EB;
+:root {
+  --background: #0F172A;
+  --card: #1E293B;
+  --primary: #2563EB;
 }
 
-body{
-background:#0F172A;
-color:white;
+body {
+  background: #0F172A;
+  color: white;
 }
 
-*{
-box-sizing:border-box;
+* {
+  box-sizing: border-box;
 }
 
-.card{
+.card {
 
-background:#1E293B;
+  background: #1E293B;
 
-border-radius:24px;
+  border-radius: 24px;
 
-border:1px solid rgba(255,255,255,.06);
+  border: 1px solid rgba(255, 255, 255, .06);
 
-backdrop-filter:blur(20px);
+  backdrop-filter: blur(20px);
+
+}
+
+* {
+  transition:
+    background-color .2s,
+    border-color .2s,
+    color .2s;
+}
+
+body {
+
+  background: #0F172A;
+
+  color: white;
+
+  overflow-x: hidden;
+
+}
+
+button {
+
+  cursor: pointer;
+
+}
+
+input,
+select {
+
+  outline: none;
+
+}
+
+::selection {
+
+  background: #2563EB;
+
+  color: white;
 
 }
