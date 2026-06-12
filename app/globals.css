@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+:root{
+--background:#0F172A;
+--card:#1E293B;
+--primary:#2563EB;
+}
+
+body{
+background:#0F172A;
+color:white;
+}
+
+*{
+box-sizing:border-box;
+}
+
+.card{
+
+background:#1E293B;
+
+border-radius:24px;
+
+border:1px solid rgba(255,255,255,.06);
+
+backdrop-filter:blur(20px);
+
+}
