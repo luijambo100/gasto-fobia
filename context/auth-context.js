@@ -1,47 +1,218 @@
-"use client";
+"use client"
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+createContext,
+useContext,
+useEffect,
+useState
+}
+from "react"
 
-const AuthContext = createContext();
+const AuthContext =
+createContext()
 
-export function AuthProvider({ children }) {
-  const [usuario, setUsuario] = useState(null);
+export function AuthProvider({
+children
+}){
 
-  useEffect(() => {
-    const saved = localStorage.getItem("usuario");
+const[
+usuario,
+setUsuario
+]=useState(null)
 
-    if (saved) {
-      setUsuario(JSON.parse(saved));
-    }
-  }, []);
+useEffect(()=>{
 
-  function login(data) {
-    setUsuario(data);
+const saved=
+localStorage.getItem(
+"usuario"
+)
 
-    localStorage.setItem("usuario", JSON.stringify(data));
-  }
+if(saved){
 
-  function logout() {
-    setUsuario(null);
+setUsuario(
+JSON.parse(saved)
+)
 
-    localStorage.removeItem("usuario");
-  }
-
-  return (
-    <AuthContext.Provider
-      value={{
-        usuario,
-
-        login,
-
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
+},[])
+
+function register({
+
+nombre,
+
+email,
+
+password
+
+}){
+
+const users=
+
+JSON.parse(
+
+localStorage.getItem(
+"usuarios"
+)
+
+||
+
+"[]"
+
+)
+
+const exists=
+
+users.find(
+
+u=>
+
+u.email===email
+
+)
+
+if(exists){
+
+return{
+
+ok:false,
+
+error:
+"Correo ya registrado"
+
+}
+
+}
+
+users.push({
+
+nombre,
+
+email,
+
+password
+
+})
+
+localStorage.setItem(
+
+"usuarios",
+
+JSON.stringify(
+users
+)
+
+)
+
+return{
+
+ok:true
+
+}
+
+}
+
+function login({
+
+email,
+
+password
+
+}){
+
+const users=
+
+JSON.parse(
+
+localStorage.getItem(
+"usuarios"
+)
+
+||
+
+"[]"
+
+)
+
+const user=
+
+users.find(
+
+u=>
+
+u.email===email
+
+&&
+
+u.password===password
+
+)
+
+if(!user){
+
+return false
+
+}
+
+localStorage.setItem(
+
+"usuario",
+
+JSON.stringify(
+user
+)
+
+)
+
+setUsuario(
+user
+)
+
+return true
+
+}
+
+function logout(){
+
+localStorage.removeItem(
+"usuario"
+)
+
+setUsuario(
+null
+)
+
+}
+
+return(
+
+<AuthContext.Provider
+
+value={{
+
+usuario,
+
+register,
+
+login,
+
+logout
+
+}}
+
+>
+
+{children}
+
+</AuthContext.Provider>
+
+)
+
+}
+
+export function useAuth(){
+
+return useContext(
+AuthContext
+)
 }
