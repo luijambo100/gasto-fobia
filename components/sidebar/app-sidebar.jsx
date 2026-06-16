@@ -13,18 +13,45 @@ import {
   PieChart,
   Settings,
   Menu,
+  Tags,
 } from "lucide-react";
 
 const items = [
-  ["Dashboard", "/dashboard", LayoutDashboard],
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
 
-  ["Transacciones", "/dashboard/transactions", Receipt],
+  {
+    label: "Transacciones",
+    href: "/dashboard/transactions",
+    icon: Receipt,
+  },
 
-  ["Presupuestos", "/dashboard/budgets", Wallet],
+  {
+    label: "Categorías",
+    href: "/dashboard/categories",
+    icon: Tags,
+  },
 
-  ["Reportes", "/dashboard/reports", PieChart],
+  {
+    label: "Presupuestos",
+    href: "/dashboard/budgets",
+    icon: Wallet,
+  },
 
-  ["Configuración", "/dashboard/settings", Settings],
+  {
+    label: "Reportes",
+    href: "/dashboard/reports",
+    icon: PieChart,
+  },
+
+  {
+    label: "Configuración",
+    href: "/dashboard/settings",
+    icon: Settings,
+  },
 ];
 
 export default function Sidebar() {
@@ -36,15 +63,15 @@ export default function Sidebar() {
     <aside
       className={`
 
-transition-all
-
-duration-300
-
+bg-slate-950
 border-r
-
 border-slate-800
 
-bg-slate-950
+transition-all
+duration-300
+
+flex
+flex-col
 
 ${sidebarOpen ? "w-72" : "w-20"}
 
@@ -52,45 +79,83 @@ ${sidebarOpen ? "w-72" : "w-20"}
     >
       <div
         className="
-p-4
+h-20
+px-5
+flex
+items-center
+justify-between
+border-b
+border-slate-800
 "
       >
-        <button onClick={toggleSidebar}>
-          <Menu />
+        {sidebarOpen && (
+          <h2
+            className="
+text-xl
+font-bold
+"
+          >
+            GastoFobia
+          </h2>
+        )}
+
+        <button
+          onClick={toggleSidebar}
+          className="
+p-2
+rounded-xl
+hover:bg-slate-800
+"
+        >
+          <Menu size={20} />
         </button>
       </div>
 
       <nav
         className="
+flex-1
+p-3
 space-y-2
-px-3
 "
       >
-        {items.map(([label, href, Icon]) => (
-          <Link
-            key={href}
-            href={href}
-            className={`
+        {items.map((item) => {
+          const active = pathname === item.href;
+
+          const Icon = item.icon;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`
+
+group
 
 flex
-
 items-center
+gap-4
 
-gap-3
+rounded-2xl
 
-rounded-xl
+px-4
+py-3
 
-p-3
+transition
 
-${pathname === href ? "bg-blue-600" : "hover:bg-slate-800"}
+${
+  active
+    ? "bg-blue-600 text-white"
+    : "text-slate-400 hover:bg-slate-900 hover:text-white"
+}
 
 `}
-          >
-            <Icon />
+            >
+              <Icon size={20} />
 
-            {sidebarOpen && label}
-          </Link>
-        ))}
+              {sidebarOpen && <span>{item.label}</span>}
+            </Link>
+          );
+        })}
       </nav>
     </aside>
   );
