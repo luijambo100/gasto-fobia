@@ -2,6 +2,7 @@
 
 import Sidebar from "../../components/sidebar/app-sidebar";
 import Navbar from "../../components/navbar/top-navbar";
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/auth-context";
@@ -15,39 +16,26 @@ export default function Layout({ children }) {
     if (!usuario) {
       router.replace("/login");
     }
-  }, [usuario]);
+  }, [usuario, router]);
 
-  if (!usuario) {
-    return null;
-  }
+  if (!usuario) return null;
 
   return (
-    <div
-      className="
-flex
-min-h-screen
-bg-slate-950
-text-white
-"
-    >
-      <Sidebar />
+    <div className="h-screen flex bg-slate-950 text-white overflow-hidden">
+      {/* SIDEBAR FIJO */}
+      <aside className="w-70 shrink-0 h-screen">
+        <Sidebar />
+      </aside>
 
-      <div
-        className="
-flex-1
-flex
-flex-col
-"
-      >
-        <Navbar />
+      {/* CONTENIDO */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* NAVBAR FIJO */}
+        <div className="shrink-0">
+          <Navbar />
+        </div>
 
-        <main
-          className="
-flex-1
-overflow-auto
-p-6
-"
-        >
+        {/* SOLO ESTA ZONA HACE SCROLL */}
+        <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
       </div>

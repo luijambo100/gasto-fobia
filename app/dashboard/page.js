@@ -1,76 +1,170 @@
 "use client";
 
+import Link from "next/link";
+import * as Icons from "lucide-react";
+import { useMemo } from "react";
+import { Plus, DollarSign, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+
 import { useFinance } from "../../context/finance-context";
-
 import StatCard from "../../components/cards/stat-card";
-
 import ExpensesChart from "../../components/charts/expenses-chart";
+import MonthlyTrendChart from "../../components/charts/monthly-trend-chart";
+import { Button } from "../../components/ui/button";
 
 export default function DashboardPage() {
-  const { ingresos, gastos, balance } = useFinance();
+  const {
+    transactions,
+    categories,
+    presupuesto,
+    totalGastado,
+    ingresos,
+    balance,
+  } = useFinance();
+
+  const recientes = useMemo(
+    () => [...transactions].reverse().slice(0, 5),
+    [transactions],
+  );
+
+  const topCategorias = useMemo(
+    () => categories.slice(0, 3),
+    [categories],
+  );
+
+  // Date.now() movido fuera del render, dentro de useMemo
+  const chartData = useMemo(() => {
+    const grouped = {};
+
+    transactions.forEach((t) => {
+      // Si la transacción no tiene fecha usamos una fecha fija,
+      // nunca Date.now() directamente en el render
+      const date = new Date(t.date ?? 0);
+      const month = date.toLocaleDateString("es-PE", { month: "short" });
+
+      if (!grouped[month]) grouped[month] = { income: 0, expense: 0 };
+      grouped[month][t.type] += Math.abs(Number(t.amount));
+    });
+
+    return Object.entries(grouped).map(([month, data]) => ({
+      month,
+      income: data.income,
+      expense: data.expense,
+    }));
+  }, [transactions]);
 
   return (
     <div className="space-y-8">
       {/* HEADER */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-slate-400 mt-1">Resumen de tus finanzas</p>
+        </div>
 
-      <div>
-        <h1 className="text-2xl font-bold">Panel Principal</h1>
-
-        <p className="text-gray-400">Resumen de tus finanzas personales</p>
+        <Link href="/dashboard/transactions">
+          <Button>
+            <Plus className="w-5 h-5 mr-2" />
+            Agregar movimiento
+          </Button>
+        </Link>
       </div>
 
       {/* TARJETAS */}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard
-          title="Ingresos"
-          value={`S/ ${ingresos}`}
-          color="text-green-500"
-        />
-
-        <StatCard
-          title="Gastos"
-          value={`S/ ${Math.abs(gastos)}`}
-          color="text-red-500"
-        />
-
-        <StatCard
-          title="Balance"
-          value={`S/ ${balance}`}
-          color={balance >= 0 ? "text-blue-500" : "text-red-500"}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard title="Balance"  value={`S/ ${balance}`}           color="text-blue-500"  icon={<DollarSign />} />
+        <StatCard title="Ingresos" value={`S/ ${ingresos}`}          color="text-green-500" icon={<TrendingUp />} />
+        <StatCard title="Gastos" value={`S/ ${totalGastado}`} color="text-red-500" icon={<TrendingDown />}/>
       </div>
 
-      {/* GRAFICO */}
+      {/* CONTENIDO */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-bold">Últimos movimientos</h2>
+                <p className="text-slate-400">Tus últimas 5 transacciones</p>
+              </div>
+              <Link href="/dashboard/transactions" className="text-blue-500 flex items-center gap-2">
+                Ver todo <ArrowRight size={18} />
+              </Link>
+            </div>
 
-      <div>
-        <ExpensesChart />
-      </div>
-
-      {/* BLOQUE INFO */}
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-slate-900 rounded-2xl p-6">
-          <h3 className="font-bold">Objetivo mensual</h3>
-
-          <p className="text-gray-400 mt-2">Controla ingresos y gastos.</p>
+            <div className="space-y-4">
+              {recientes.length > 0 ? (
+                recientes.map((t) => (
+                  <div key={t.id} className="flex justify-between border-b border-slate-800 pb-4">
+                    <div>
+                      <p className="font-medium">{t.description}</p>
+                      <p className="text-sm text-slate-400">{t.category}</p>
+                    </div>
+                    <p className={t.type === "income" ? "text-green-500" : "text-red-500"}>
+                      S/ {Math.abs(t.amount)}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-500">No hay movimientos</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="bg-slate-900 rounded-2xl p-6">
-          <h3 className="font-bold">Estado financiero</h3>
+        <div>
+          <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
+            <h2 className="text-xl font-bold">Estado presupuesto</h2>
+            <p className="text-slate-400 mt-1">Resumen actual</p>
 
-          <p className="text-gray-400 mt-2">Tus movimientos están guardados.</p>
+            <div className="mt-8">
+              <div className="flex justify-between">
+                <span>Gastado</span>
+                <span>S/ {totalGastado}</span>
+              </div>
+              <div className="mt-2">
+                <div className="h-3 bg-slate-800 rounded-full">
+                  <div
+                    className="h-full bg-blue-600 rounded-full"
+                    style={{ width: `${Math.min((totalGastado / presupuesto) * 100 || 0, 100)}%` }}
+                  />
+                </div>
+              </div>
+              <div className="mt-4 text-slate-400">Presupuesto: S/ {presupuesto}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* RESUMEN */}
+      {/* TENDENCIA */}
+      {chartData.length > 0 && <MonthlyTrendChart data={chartData} />}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-900 rounded-2xl p-6">Ingresos activos</div>
+      {/* ABAJO */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
+          <h2 className="text-xl font-bold mb-6">Gastos por categoría</h2>
+          <ExpensesChart />
+        </div>
 
-        <div className="bg-slate-900 rounded-2xl p-6">Control mensual</div>
+        <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
+          <h2 className="text-xl font-bold">Este mes</h2>
+          <p className="text-slate-400 mb-6">Resumen mensual</p>
 
-        <div className="bg-slate-900 rounded-2xl p-6">Últimos movimientos</div>
+          <div className="space-y-5">
+            {topCategorias.map((cat) => {
+              const Icon = Icons[cat.icon] || Icons.Wallet;
+              return (
+                <div key={cat.id} className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <Icon size={22} />
+                    <span>{cat.name}</span>
+                  </div>
+                  <span className="text-slate-400">
+                    {cat.type === "income" ? "Ingreso" : "Gasto"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

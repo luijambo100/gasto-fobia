@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import { useFinance } from "../../../context/finance-context";
 
 export default function BudgetsPage() {
