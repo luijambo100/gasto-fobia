@@ -5,115 +5,162 @@ import { useFinance } from "../../../context/finance-context";
 
 export default function BudgetsPage() {
   const {
-    presupuesto,
-    actualizarPresupuesto,
+    categories,
+    presupuestos,
+    actualizarPresupuestoCategoria,
     totalGastado,
-    porcentaje,
-    excedido,
   } = useFinance();
 
-  const [valor, setValor] = useState(presupuesto);
+  const [valores, setValores] = useState(() => {
+    const inicial = {};
+
+    categories.forEach((cat) => {
+      if (cat.type === "expense") {
+        const existente = presupuestos.find((p) => p.category === cat.name);
+
+        inicial[cat.name] = existente?.amount || "";
+      }
+    });
+
+    return inicial;
+  });
+
+  function cambiarValor(nombre, valor) {
+    setValores((prev) => ({
+      ...prev,
+      [nombre]: valor,
+    }));
+  }
 
   return (
-    <div className="space-y-6">
-      <h1
-        className="
-text-2xl
-font-bold
-"
-      >
-        Presupuesto mensual
-      </h1>
+    <div className="space-y-8">
+      {/* HEADER */}
 
-      <div
-        className="
-bg-slate-900
-p-6
-rounded-2xl
-border
-border-slate-800
-space-y-4
-"
-      >
-        <input
-          value={valor}
-          onChange={(e) => setValor(e.target.value)}
-          placeholder="Ej: 3000"
-          className="
-w-full
-bg-slate-800
-p-3
-rounded
-"
-        />
+      <div>
+        <h1 className="text-3xl font-bold">Presupuestos</h1>
 
-        <button
-          onClick={() => actualizarPresupuesto(valor)}
-          className="
-w-full
-bg-blue-600
-py-3
-rounded
-"
-        >
-          Guardar presupuesto
-        </button>
+        <p className="text-slate-400 mt-1">
+          Administra presupuesto por categoría
+        </p>
       </div>
 
-      <div
-        className="
-bg-slate-900
-p-6
-rounded-2xl
-space-y-4
-"
-      >
-        <div
-          className="
-flex
-justify-between
-"
-        >
-          <span>Gastado</span>
+      {/* CATEGORIAS */}
 
-          <span>S/ {totalGastado}</span>
-        </div>
+      <div className="grid md:grid-cols-2 gap-6">
+        {categories
+          .filter((cat) => cat.type === "expense")
+          .map((categoria) => {
+            const presupuesto =
+              presupuestos.find((p) => p.category === categoria.name)?.amount ||
+              0;
 
-        <div
-          className="
-w-full
-bg-slate-800
-rounded-full
-h-4
-overflow-hidden
-"
-        >
-          <div
-            style={{
-              width: `${porcentaje}%`,
-            }}
-            className={`
+            const gastado = totalGastado[categoria.name] || 0;
 
-h-full
+            const porcentaje =
+              presupuesto > 0
+                ? Math.min((gastado / presupuesto) * 100, 100)
+                : 0;
 
-${excedido ? "bg-red-500" : "bg-green-500"}
+            const excedido = presupuesto > 0 && gastado > presupuesto;
 
-`}
-          />
-        </div>
+            return (
+              <div
+                key={categoria.id}
+                className="
+                bg-slate-900
+                border
+                border-slate-800
+                rounded-3xl
+                p-6
+                "
+              >
+                {/* TITULO */}
 
-        <p>{porcentaje.toFixed(0)}% del presupuesto</p>
+                <div className="flex justify-between mb-5">
+                  <h2 className="text-xl font-bold">{categoria.name}</h2>
 
-        {excedido && (
-          <div
-            className="
-text-red-500
-font-semibold
-"
-          >
-            ⚠ Has excedido tu presupuesto
-          </div>
-        )}
+                  <span className="text-slate-400">Gasto</span>
+                </div>
+
+                {/* INPUT + BOTON */}
+
+                <div className="flex gap-3">
+                  <input
+                    type="number"
+                    value={valores[categoria.name]}
+                    placeholder="Ej: 500"
+                    onChange={(e) =>
+                      cambiarValor(categoria.name, e.target.value)
+                    }
+                    className="
+                    flex-1
+                    bg-slate-800
+                    p-3
+                    rounded-xl
+                    "
+                  />
+
+                  <button
+                    onClick={() =>
+                      actualizarPresupuestoCategoria(
+                        categoria.name,
+                        valores[categoria.name],
+                      )
+                    }
+                    className="
+                    px-5
+                    bg-blue-600
+                    hover:bg-blue-700
+                    rounded-xl
+                    "
+                  >
+                    Guardar
+                  </button>
+                </div>
+
+                {/* INFO */}
+
+                <div className="mt-6 space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Gastado</span>
+
+                    <span>S/ {gastado}</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Presupuesto</span>
+
+                    <span>S/ {presupuesto}</span>
+                  </div>
+
+                  {/* BARRA */}
+
+                  <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className={`
+                        h-full
+                        transition-all
+                        ${excedido ? "bg-red-500" : "bg-green-500"}
+                      `}
+                      style={{
+                        width: `${porcentaje}%`,
+                      }}
+                    />
+                  </div>
+
+                  <p className="text-sm text-slate-400">
+                    {porcentaje.toFixed(0)}% usado
+                  </p>
+
+                  {excedido && (
+                    <div className="text-red-500 font-medium">
+                      ⚠ Presupuesto excedido
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
       </div>
     </div>
   );
