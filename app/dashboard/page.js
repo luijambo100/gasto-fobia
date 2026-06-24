@@ -3,7 +3,13 @@
 import Link from "next/link";
 import * as Icons from "lucide-react";
 import { useMemo } from "react";
-import { Plus, DollarSign, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import {
+  Plus,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  ArrowRight,
+} from "lucide-react";
 
 import { useFinance } from "../../context/finance-context";
 import StatCard from "../../components/cards/stat-card";
@@ -15,7 +21,9 @@ export default function DashboardPage() {
   const {
     transactions,
     categories,
-    presupuesto,
+    presupuestoTotal,
+    porcentaje,
+    excedido,
     totalGastado,
     ingresos,
     balance,
@@ -26,10 +34,7 @@ export default function DashboardPage() {
     [transactions],
   );
 
-  const topCategorias = useMemo(
-    () => categories.slice(0, 3),
-    [categories],
-  );
+  const topCategorias = useMemo(() => categories.slice(0, 3), [categories]);
 
   // Date.now() movido fuera del render, dentro de useMemo
   const chartData = useMemo(() => {
@@ -71,9 +76,24 @@ export default function DashboardPage() {
 
       {/* TARJETAS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Balance"  value={`S/ ${balance}`}           color="text-blue-500"  icon={<DollarSign />} />
-        <StatCard title="Ingresos" value={`S/ ${ingresos}`}          color="text-green-500" icon={<TrendingUp />} />
-        <StatCard title="Gastos" value={`S/ ${totalGastado}`} color="text-red-500" icon={<TrendingDown />}/>
+        <StatCard
+          title="Balance"
+          value={`S/ ${balance}`}
+          color="text-blue-500"
+          icon={<DollarSign />}
+        />
+        <StatCard
+          title="Ingresos"
+          value={`S/ ${ingresos}`}
+          color="text-green-500"
+          icon={<TrendingUp />}
+        />
+        <StatCard
+          title="Gastos"
+          value={`S/ ${totalGastado}`}
+          color="text-red-500"
+          icon={<TrendingDown />}
+        />
       </div>
 
       {/* CONTENIDO */}
@@ -85,7 +105,10 @@ export default function DashboardPage() {
                 <h2 className="text-xl font-bold">Últimos movimientos</h2>
                 <p className="text-slate-400">Tus últimas 5 transacciones</p>
               </div>
-              <Link href="/dashboard/transactions" className="text-blue-500 flex items-center gap-2">
+              <Link
+                href="/dashboard/transactions"
+                className="text-blue-500 flex items-center gap-2"
+              >
                 Ver todo <ArrowRight size={18} />
               </Link>
             </div>
@@ -93,12 +116,19 @@ export default function DashboardPage() {
             <div className="space-y-4">
               {recientes.length > 0 ? (
                 recientes.map((t) => (
-                  <div key={t.id} className="flex justify-between border-b border-slate-800 pb-4">
+                  <div
+                    key={t.id}
+                    className="flex justify-between border-b border-slate-800 pb-4"
+                  >
                     <div>
                       <p className="font-medium">{t.description}</p>
                       <p className="text-sm text-slate-400">{t.category}</p>
                     </div>
-                    <p className={t.type === "income" ? "text-green-500" : "text-red-500"}>
+                    <p
+                      className={
+                        t.type === "income" ? "text-green-500" : "text-red-500"
+                      }
+                    >
                       S/ {Math.abs(t.amount)}
                     </p>
                   </div>
@@ -110,26 +140,49 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div>
-          <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
-            <h2 className="text-xl font-bold">Estado presupuesto</h2>
-            <p className="text-slate-400 mt-1">Resumen actual</p>
+        <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
+          <h2 className="text-xl font-bold">Presupuesto total</h2>
+          <p className="text-slate-400 mt-1">Resumen actual</p>
 
-            <div className="mt-8">
-              <div className="flex justify-between">
-                <span>Gastado</span>
-                <span>S/ {totalGastado}</span>
-              </div>
-              <div className="mt-2">
-                <div className="h-3 bg-slate-800 rounded-full">
-                  <div
-                    className="h-full bg-blue-600 rounded-full"
-                    style={{ width: `${Math.min((totalGastado / presupuesto) * 100 || 0, 100)}%` }}
-                  />
-                </div>
-              </div>
-              <div className="mt-4 text-slate-400">Presupuesto: S/ {presupuesto}</div>
+          <div className="mt-8">
+            <div className="flex justify-between">
+              <span>Gastado</span>
+              <span className={excedido ? "text-red-500" : ""}>
+                S/ {totalGastado}
+              </span>
             </div>
+
+            <div className="mt-2">
+              <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${excedido ? "bg-red-500" : "bg-blue-600"}`}
+                  style={{ width: `${porcentaje}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="mt-3 flex justify-between text-sm text-slate-400">
+              <span>{porcentaje.toFixed(0)}% usado</span>
+              <span>Presupuesto: S/ {presupuestoTotal}</span>
+            </div>
+
+            {excedido && (
+              <p className="mt-3 text-red-500 text-sm font-medium">
+                ⚠ Presupuesto total excedido
+              </p>
+            )}
+
+            {presupuestoTotal === 0 && (
+              <p className="mt-3 text-slate-500 text-sm">
+                Sin presupuesto configurado —{" "}
+                <Link
+                  href="/dashboard/budgets"
+                  className="text-blue-500 underline"
+                >
+                  configúralo aquí
+                </Link>
+              </p>
+            )}
           </div>
         </div>
       </div>

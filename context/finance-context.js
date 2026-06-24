@@ -62,9 +62,7 @@ export function FinanceProvider({ children }) {
 
   const [presupuestos, setPresupuestos] = useStorage("budgets", []);
 
-  // ─────────────────────────────
   // CATEGORIAS
-  // ─────────────────────────────
 
   function agregarCategoria(categoria) {
     const nueva = {
@@ -98,9 +96,7 @@ export function FinanceProvider({ children }) {
     }
   }
 
-  // ─────────────────────────────
   // TRANSACCIONES
-  // ─────────────────────────────
 
   function agregarTransaccion(data) {
     setTransactions((prev) => [
@@ -119,9 +115,7 @@ export function FinanceProvider({ children }) {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
   }
 
-  // ─────────────────────────────
   // PRESUPUESTOS
-  // ─────────────────────────────
 
   function actualizarPresupuestoCategoria(category, amount) {
     const valor = Number(amount) || 0;
@@ -158,10 +152,7 @@ export function FinanceProvider({ children }) {
     return presupuestos.find((p) => p.category === category)?.amount || 0;
   }
 
-  // ─────────────────────────────
   // CALCULOS
-  // ─────────────────────────────
-
   const ingresos = transactions
     .filter((t) => t.type === "income")
     .reduce((a, t) => a + (Number(t.amount) || 0), 0);
@@ -169,6 +160,14 @@ export function FinanceProvider({ children }) {
   const totalGastado = transactions
     .filter((t) => t.type === "expense")
     .reduce((a, t) => a + Math.abs(Number(t.amount) || 0), 0);
+
+  const gastadoPorCategoria = transactions
+    .filter((t) => t.type === "expense")
+    .reduce((acc, t) => {
+      const cat = t.category;
+      acc[cat] = (acc[cat] || 0) + Math.abs(Number(t.amount) || 0);
+      return acc;
+    }, {});
 
   const balance = ingresos - totalGastado;
 
@@ -199,6 +198,7 @@ export function FinanceProvider({ children }) {
 
         actualizarPresupuestoCategoria,
         obtenerPresupuestoCategoria,
+        gastadoPorCategoria,
 
         ingresos,
         totalGastado,

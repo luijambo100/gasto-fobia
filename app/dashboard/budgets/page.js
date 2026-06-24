@@ -8,7 +8,7 @@ export default function BudgetsPage() {
     categories,
     presupuestos,
     actualizarPresupuestoCategoria,
-    totalGastado,
+    gastadoPorCategoria,
   } = useFinance();
 
   const [valores, setValores] = useState(() => {
@@ -54,7 +54,7 @@ export default function BudgetsPage() {
               presupuestos.find((p) => p.category === categoria.name)?.amount ||
               0;
 
-            const gastado = totalGastado[categoria.name] || 0;
+            const gastado = gastadoPorCategoria[categoria.name] || 0;
 
             const porcentaje =
               presupuesto > 0
