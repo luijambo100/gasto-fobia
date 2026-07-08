@@ -20,12 +20,12 @@ export default function MonthlyTrendChart({ data }) {
         </p>
       </div>
 
-      <div className="w-full h-70 min-w-0">
-        <ResponsiveContainer width="100%" aspect={4.5}>
+      <div className="w-full h-56 md:h-70 min-w-0">
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
             <XAxis
               dataKey="month"
-              tick={{ fill: "#94A3B8" }}
+              tick={{ fill: "#94A3B8", fontSize: 12 }}
               axisLine={false}
               tickLine={false}
             />
@@ -34,6 +34,7 @@ export default function MonthlyTrendChart({ data }) {
               tick={{ fill: "#94A3B8" }}
               axisLine={false}
               tickLine={false}
+              width={40}
             />
 
             <Tooltip

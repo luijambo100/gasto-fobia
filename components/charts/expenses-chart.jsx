@@ -27,9 +27,9 @@ export default function ExpensesChart() {
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
       <h2 className="font-bold mb-6">Gastos por categoría</h2>
 
-      <div className="w-full h-75 min-w-0">
+      <div className="w-full h-56 md:h-75 min-w-0">
         {data.length > 0 ? (
-          <ResponsiveContainer width="100%" aspect={2}>
+          <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={data}
@@ -37,7 +37,7 @@ export default function ExpensesChart() {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
-                outerRadius={100}
+                outerRadius="80%"
               >
                 {data.map((_, index) => (
                   <Cell key={index} fill={COLORS[index % COLORS.length]} />

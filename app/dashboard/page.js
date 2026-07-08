@@ -36,13 +36,10 @@ export default function DashboardPage() {
 
   const topCategorias = useMemo(() => categories.slice(0, 3), [categories]);
 
-  // Date.now() movido fuera del render, dentro de useMemo
   const chartData = useMemo(() => {
     const grouped = {};
 
     transactions.forEach((t) => {
-      // Si la transacción no tiene fecha usamos una fecha fija,
-      // nunca Date.now() directamente en el render
       const date = new Date(t.date ?? 0);
       const month = date.toLocaleDateString("es-PE", { month: "short" });
 
@@ -100,14 +97,16 @@ export default function DashboardPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h2 className="text-xl font-bold">Últimos movimientos</h2>
+            <div className="flex justify-between items-center gap-3 mb-6">
+              <div className="min-w-0">
+                <h2 className="text-xl font-bold truncate">
+                  Últimos movimientos
+                </h2>
                 <p className="text-slate-400">Tus últimas 5 transacciones</p>
               </div>
               <Link
                 href="/dashboard/transactions"
-                className="text-blue-500 flex items-center gap-2"
+                className="text-blue-500 flex items-center gap-2 shrink-0"
               >
                 Ver todo <ArrowRight size={18} />
               </Link>
@@ -118,16 +117,18 @@ export default function DashboardPage() {
                 recientes.map((t) => (
                   <div
                     key={t.id}
-                    className="flex justify-between border-b border-slate-800 pb-4"
+                    className="flex justify-between items-center gap-3 border-b border-slate-800 pb-4"
                   >
-                    <div>
-                      <p className="font-medium">{t.description}</p>
-                      <p className="text-sm text-slate-400">{t.category}</p>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{t.description}</p>
+                      <p className="text-sm text-slate-400 truncate">
+                        {t.category}
+                      </p>
                     </div>
                     <p
-                      className={
+                      className={`shrink-0 ${
                         t.type === "income" ? "text-green-500" : "text-red-500"
-                      }
+                      }`}
                     >
                       S/ {Math.abs(t.amount)}
                     </p>
@@ -205,12 +206,15 @@ export default function DashboardPage() {
             {topCategorias.map((cat) => {
               const Icon = Icons[cat.icon] || Icons.Wallet;
               return (
-                <div key={cat.id} className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <Icon size={22} />
-                    <span>{cat.name}</span>
+                <div
+                  key={cat.id}
+                  className="flex justify-between items-center gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Icon size={22} className="shrink-0" />
+                    <span className="truncate">{cat.name}</span>
                   </div>
-                  <span className="text-slate-400">
+                  <span className="text-slate-400 shrink-0">
                     {cat.type === "income" ? "Ingreso" : "Gasto"}
                   </span>
                 </div>

@@ -13,6 +13,8 @@ export function UIProvider({ children }) {
 
     if (saved !== null) {
       setSidebarOpen(saved === "true");
+    } else if (window.innerWidth < 768) {
+      setSidebarOpen(false);
     }
   }, []);
 

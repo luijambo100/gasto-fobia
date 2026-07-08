@@ -9,7 +9,6 @@ import { useAuth } from "../../context/auth-context";
 
 export default function Layout({ children }) {
   const router = useRouter();
-
   const { usuario } = useAuth();
 
   useEffect(() => {
@@ -22,22 +21,17 @@ export default function Layout({ children }) {
 
   return (
     <div className="h-screen flex bg-slate-950 text-white overflow-hidden">
-      {/* SIDEBAR FIJO */}
-      <aside className="w-70 shrink-0 h-screen">
-        <Sidebar />
-      </aside>
+      <Sidebar />
 
       {/* CONTENIDO */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden w-full">
         {/* NAVBAR FIJO */}
         <div className="shrink-0">
           <Navbar />
         </div>
 
         {/* SOLO ESTA ZONA HACE SCROLL */}
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   );
