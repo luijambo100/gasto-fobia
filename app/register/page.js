@@ -11,21 +11,14 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function crearCuenta() {
+  async function crearCuenta() {
     if (!nombre || !email || !password) {
       alert("Completa todos los campos");
-
       return;
     }
-    const result = register({
-      nombre,
-      email,
-      password,
-    });
-
+    const result = await register({ nombre, email, password });
     if (!result.ok) {
       alert(result.error);
-
       return;
     }
     alert("Cuenta creada");

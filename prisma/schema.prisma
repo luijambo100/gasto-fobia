@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Usuario {
+  id            String        @id @default(cuid())
+  nombre        String
+  email         String        @unique
+  password      String
+  creadoEn      DateTime      @default(now())
+  categorias    Categoria[]
+  presupuestos  Presupuesto[]
+  transacciones Transaccion[]
+}
+
+model Transaccion {
+  id          String   @id @default(cuid())
+  descripcion String
+  monto       Decimal  @db.Decimal(10, 2)
+  tipo        String
+  categoria   String
+  fecha       DateTime @default(now())
+  creadoEn    DateTime @default(now())
+  usuarioId   String
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+}
+
+model Presupuesto {
+  id        String   @id @default(cuid())
+  monto     Decimal  @db.Decimal(10, 2)
+  categoria String
+  creadoEn  DateTime @default(now())
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+}
+
+model Categoria {
+  id        String  @id @default(cuid())
+  nombre    String
+  icono     String  @default("tag")
+  color     String  @default("#6366f1")
+  usuarioId String
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, nombre])
+}

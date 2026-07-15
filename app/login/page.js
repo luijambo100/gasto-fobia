@@ -13,19 +13,13 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
 
-  function entrar(e) {
+  async function entrar(e) {
     e.preventDefault();
-
-    const ok = login({
-      email,
-      password,
-    });
-
+    const ok = await login({ email, password });
     if (!ok) {
       alert("Correo o contraseña incorrectos");
       return;
     }
-
     router.replace("/dashboard");
   }
 
@@ -33,7 +27,7 @@ export default function Login() {
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
       <div className="w-full max-w-5xl grid lg:grid-cols-2 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/70 backdrop-blur shadow-2xl">
         {/* IZQUIERDA */}
-        <div className="hidden lg:flex flex-col justify-center p-14 bg-gradient-to-br from-blue-700 to-slate-950">
+        <div className="hidden lg:flex flex-col justify-center p-14 bg-linear-to-br from-blue-700 to-slate-950">
           <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mb-8">
             <Wallet size={32} />
           </div>
